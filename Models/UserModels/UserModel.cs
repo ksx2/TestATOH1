@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TestATOH1.Models.UserModels
 {
@@ -31,13 +32,13 @@ namespace TestATOH1.Models.UserModels
         public DateTime CreatedOn { get; set; }//date the user was created
         [Required]
         public string CreatedBy { get; set; }// login user on whose behalf the user was created
-
+        [AllowNull]
         public DateTime ModifiedOn { get; set; }//date the user was changed
-
+        [AllowNull]
         public string ModifiedBy { get; set; } // login user on whose behalf the user was changed
-
+        [AllowNull]
         public DateTime RevokedOn { get; set; }//date the user was deleted
-
+        [AllowNull]
         public string RevokedBy { get; set; } // login user on whose behalf the user was deleted
     }
 }

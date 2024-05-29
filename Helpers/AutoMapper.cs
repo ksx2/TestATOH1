@@ -10,7 +10,11 @@ namespace TestATOH1.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserCreateRequestModel, UserModel>().ForMember("Guid",opt => Guid.NewGuid());
+            CreateMap<UserCreateRequestModel, UserModel>().ForMember(dest => dest.Guid, opt => opt.MapFrom(src => Guid.NewGuid()))
+                                                          .ForMember(dest => dest.ModifiedOn, opt => opt.MapFrom(src => DateTime.MaxValue))
+                                                          .ForMember(dest => dest.ModifiedBy, opt => opt.MapFrom(src => string.Empty))
+                                                          .ForMember(dest => dest.RevokedOn, opt => opt.MapFrom(src => DateTime.MaxValue))
+                                                          .ForMember(dest => dest.RevokedBy, opt => opt.MapFrom(src => string.Empty));
             CreateMap<UserModel, AuthenticateResponse>();
             CreateMap<UserModel,UserGetByLoginResponseModel>();
             

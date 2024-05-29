@@ -33,7 +33,7 @@ namespace TestATOH1.Helpers.Authorize
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("Guid",user.Guid.ToString()),
-                                                    new Claim(ClaimTypes.Role, userRole) ,
+                                                    new Claim(ClaimTypes.Role, userRole),
                                                     new Claim(ClaimTypes.Name, user.Login)}),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

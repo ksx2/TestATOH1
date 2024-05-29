@@ -1,12 +1,8 @@
 ﻿using TestATOH1.Helpers;
-//using System;
 using AutoMapper;
-//using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
-//using TestATOH1.Models.Repository;
 using TestATOH1.Models.AuthentificateModels;
 using TestATOH1.Models.UserModels;
-//using Azure.Core;
 using System.IdentityModel.Tokens.Jwt;
 using TestATOH1.Models.DataBaseContext;
 using TestATOH1.Helpers.Authorize;
@@ -27,8 +23,6 @@ namespace TestATOH1.Models.Repository
             _mapper = mapper;
             _jwt = jwt;
         }
-
-
         //AUTHENTICATE
         public async Task<string> Authenticate(AuthenticateRequest model)
         {
@@ -50,7 +44,7 @@ namespace TestATOH1.Models.Repository
             response.Token = _jwt.GenerateToken(user);
             return response.Token;
         }
-
+        
         //CREATE
         public async Task<UserModel> Create(UserCreateRequestModel userCreate)
         {
@@ -79,7 +73,7 @@ namespace TestATOH1.Models.Repository
         {
             if (_context.Users == null) throw new KeyNotFoundException("Users not found"); 
 
-            return await _context.Users.Where(u => u.RevokedOn == null).OrderBy(u => u.CreatedOn).ToListAsync<UserModel>();
+            return await _context.Users.Where(u => u.RevokedOn == DateTime.MaxValue).OrderBy(u => u.CreatedOn).ToListAsync<UserModel>();
             
         }
         public async Task<UserGetByLoginResponseModel> GetByLogin(string login)
@@ -92,14 +86,14 @@ namespace TestATOH1.Models.Repository
                 throw new KeyNotFoundException("User with this login not found");
             }
             var response = _mapper.Map<UserGetByLoginResponseModel>(user);
-            response.Available = user.RevokedOn != null ? false: true;
+            response.Available = user.RevokedOn != DateTime.MaxValue ? false: true;
             return response;
         }
         public async Task<UserModel> GetByLoginAndPassword(string login,string password)
         {
             if (_context.Users == null) throw new KeyNotFoundException("Users not found");
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.RevokedOn == null);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.RevokedOn == DateTime.MaxValue);
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
             if (!isPasswordValid && user == null)
             {
@@ -111,7 +105,7 @@ namespace TestATOH1.Models.Repository
         {
             if (_context.Users == null) throw new KeyNotFoundException("Users not found"); 
 
-            return await _context.Users.Where(u => u.Birthday.Value.AddDays(old*365)>DateTime.Now).ToListAsync<UserModel>();
+            return await _context.Users.Where(u => u.Birthday.Value.AddDays(old*365)<DateTime.Now).ToListAsync<UserModel>();
         }
 
         //REMOVE
@@ -143,44 +137,70 @@ namespace TestATOH1.Models.Repository
         }
 
         //UPDATE
-        public async Task<UserModel> UpdateUsernameGenderBirthday(string login, UserUpdateNameGenderBirthdayRequestModel user)
+        public async Task<UserModel> UpdateUsernameGenderBirthday(string login, UserUpdateNameGenderBirthdayRequestModel user,string name)
         {
+            var modifyFlag = false;
             var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == login);
             if (searchUser == null)
             {
                 throw new KeyNotFoundException("User with this login not found");
             }
 
-            if (user.Name != null) searchUser.Name = user.Name;
-            if (user.Gender != null) searchUser.Gender = (int)user.Gender;
-            if(user.Birthday != null) searchUser.Birthday = (DateTime)user.Birthday;
+            if (user.Name != null)
+            {
+                searchUser.Name = user.Name;
+                modifyFlag = true;
+            }
+            if (user.Gender != null)
+            {
+                searchUser.Gender = (int)user.Gender;
+                modifyFlag = true;
+
+            }
+            if (user.Birthday != null)
+            {
+                searchUser.Birthday = (DateTime)user.Birthday;
+                modifyFlag = true;
+
+            }
+            if (modifyFlag)
+            {
+                searchUser.ModifiedBy = name;
+                searchUser.ModifiedOn = DateTime.Now;
+            }
             await _context.SaveChangesAsync();
             return searchUser;
         }
-        public async Task<string> UpdatePassword(string login, string password)
+        public async Task<string> UpdatePassword(string login, string password,string name)
         {
-            var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == login && x.RevokedOn == null);
+            var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == login && x.RevokedOn == DateTime.MaxValue);
             if (searchUser == null)
             {
                 throw new KeyNotFoundException("User with this login not found");
             }
             searchUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            searchUser.ModifiedBy = name;
+            searchUser.ModifiedOn = DateTime.Now;
+            await _context.SaveChangesAsync();
             return $"User password with login {searchUser.Login} was updated";
         }
 
-        public async Task<string> UpdateLogin(string startLogin,string endLogin)
+        public async Task<string> UpdateLogin(string startLogin,string endLogin, string name)
         {
-            var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == startLogin && x.RevokedOn == null);
+            var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == startLogin && x.RevokedOn == DateTime.MaxValue);
             if (searchUser == null)
             {
                 throw new KeyNotFoundException("User with this login not found");
             }
             if (_context.Users.Any(u => u.Login == endLogin)) throw new AppException("Login is busy");
             searchUser.Login = endLogin;
+            searchUser.ModifiedBy = name;
+            searchUser.ModifiedOn = DateTime.Now;
+            await _context.SaveChangesAsync();
             return $"User with login {startLogin} was updated to {searchUser.Login}";
         }
 
-        public async Task<UserModel> UpdateRevoked(string login)
+        public async Task<UserModel> UpdateRevoked(string login, string name)
         {
             var searchUser = await _context.Users.FirstOrDefaultAsync(x => x.Login == login && x.RevokedOn != DateTime.MaxValue && x.RevokedBy != string.Empty);
             if (searchUser == null)
@@ -189,6 +209,8 @@ namespace TestATOH1.Models.Repository
             }
             searchUser.RevokedBy = string.Empty;
             searchUser.RevokedOn = DateTime.MaxValue;
+            searchUser.ModifiedBy = name;
+            searchUser.ModifiedOn = DateTime.Now;
             await _context.SaveChangesAsync();
             return searchUser;
 
@@ -205,7 +227,7 @@ namespace TestATOH1.Models.Repository
 
         public async Task<UserModel> GetAvailableUser (string login)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.RevokedOn == null);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Login == login && u.RevokedOn == DateTime.MaxValue);
         }
 
 

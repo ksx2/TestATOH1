@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestATOH1.Models.DataBaseContext;
 
@@ -11,9 +12,11 @@ using TestATOH1.Models.DataBaseContext;
 namespace TestATOH1.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    partial class UsersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528171221_Edit")]
+    partial class Edit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,10 +53,9 @@ namespace TestATOH1.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -65,10 +67,9 @@ namespace TestATOH1.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RevokedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("RevokedOn")
+                    b.Property<DateTime?>("RevokedOn")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Guid");
@@ -81,19 +82,19 @@ namespace TestATOH1.Migrations
                     b.HasData(
                         new
                         {
-                            Guid = new Guid("43b0dc01-04f2-4777-abc7-ade84bdd8613"),
+                            Guid = new Guid("6577bef8-c3ac-4aad-ac79-2feba0bb411f"),
                             Admin = true,
                             Birthday = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
                             CreatedBy = "admin",
-                            CreatedOn = new DateTime(2024, 5, 28, 20, 53, 15, 584, DateTimeKind.Local).AddTicks(1903),
+                            CreatedOn = new DateTime(2024, 5, 28, 20, 12, 21, 248, DateTimeKind.Local).AddTicks(6646),
                             Gender = 1,
                             Login = "Admin",
-                            ModifiedBy = "",
-                            ModifiedOn = new DateTime(2024, 5, 28, 20, 53, 15, 584, DateTimeKind.Local).AddTicks(1919),
+                            ModifiedBy = "admin",
+                            ModifiedOn = new DateTime(2024, 5, 28, 20, 12, 21, 248, DateTimeKind.Local).AddTicks(6682),
                             Name = "Max",
-                            PasswordHash = "$2a$11$1iIM0FCYzNJhhY0zlvR8MOFKY4rFlZcxChc/1tOiKqxiHFVQhn6p.",
-                            RevokedBy = "",
-                            RevokedOn = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999)
+                            PasswordHash = "$2a$11$sBEcnHq4SEDY/wNe66iH2OU9PXze0hLTueafE4qLv5M2oZ41lfMue",
+                            RevokedBy = "admin",
+                            RevokedOn = new DateTime(2024, 5, 28, 20, 12, 21, 248, DateTimeKind.Local).AddTicks(6685)
                         });
                 });
 #pragma warning restore 612, 618

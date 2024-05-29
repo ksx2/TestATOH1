@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace TestATOH1.Models.UserModels
@@ -44,7 +45,7 @@ namespace TestATOH1.Models.UserModels
         [Required(ErrorMessage = "This field is required")]
         [DataType(DataType.DateTime)]
 
-
+        
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;//date the user was created
 
 

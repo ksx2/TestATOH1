@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using TestATOH1.Helpers;
 using TestATOH1.Helpers.Authorize;
@@ -46,7 +47,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddDbContext<UsersDbContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("connectionstr")));
 
 builder.Services.AddAutoMapper(typeof(Program));//add automapper
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));//(for secrets)
 builder.Services.AddScoped<IJWTGenerate, JWTGenerate>();//token generation
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => //auth jwt bearer parameters

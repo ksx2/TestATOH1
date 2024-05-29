@@ -15,7 +15,7 @@ namespace TestATOH1.Controllers
     {
         private readonly IUserRepository _repository;
         private readonly AppSettings _appSettings;
-        //public AuthenticateRequest authenticate;
+        
 
         public UserController(IUserRepository userRepository, IOptions<AppSettings> appSettings)
         {
@@ -25,16 +25,16 @@ namespace TestATOH1.Controllers
 
         //AUTH
         [HttpPost("authenticate")]
-        public string Authenticate(AuthenticateRequest model)
+        public async Task<string> Authenticate(AuthenticateRequest model)
         {
-            var response = _repository.Authenticate(model);
-            return response.Result;
+            return await _repository.Authenticate(model);
+            
         }
 
         //CREATE
         //1.Создание пользователя по логину, паролю, имени, полу и дате рождения
         //+ указание будет ли пользователь админом(Доступно Админам)
-        [Authorize()]
+        [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public async Task<UserModel> Create(UserCreateRequestModel userCreate)
         {
@@ -60,7 +60,7 @@ namespace TestATOH1.Controllers
         {
             if (User.IsInRole("admin"))
             {
-                return await _repository.UpdateUsernameGenderBirthday(login,userModel);
+                return await _repository.UpdateUsernameGenderBirthday(login,userModel, User.Identity.Name);
             }
             else
             {
@@ -71,7 +71,7 @@ namespace TestATOH1.Controllers
                 {
                     throw new AppException("Available only to the user himself");
                 }
-                return await _repository.UpdateUsernameGenderBirthday(login, userModel);
+                return await _repository.UpdateUsernameGenderBirthday(login, userModel, User.Identity.Name);
             }
         }
         //3) Изменение пароля(Пароль может менять либо Администратор, либо лично пользователь, если
@@ -82,7 +82,7 @@ namespace TestATOH1.Controllers
         {
             if (User.IsInRole("admin"))
             {
-                return await _repository.UpdatePassword(login,password);
+                return await _repository.UpdatePassword(login,password, User.Identity.Name);
             }
             else
             {
@@ -93,19 +93,19 @@ namespace TestATOH1.Controllers
                 {
                     throw new AppException("Available only to the user himself");
                 }
-                return await _repository.UpdatePassword(login, password);
+                return await _repository.UpdatePassword(login, password, User.Identity.Name);
             }
         }
 
         //4) Изменение логина(Логин может менять либо Администратор, либо лично пользователь, если
         //он активен (отсутствует RevokedOn), логин должен оставаться уникальным)
         [Authorize]
-        [HttpPut("update/login")]
+        [HttpPut("update")]
         public async Task<string> UpdateLogin([FromQuery]string startLogin, [FromBody] string endLogin)
         {
             if (User.IsInRole("admin"))
             {
-                return await _repository.UpdateLogin(startLogin,endLogin);
+                return await _repository.UpdateLogin(startLogin,endLogin, User.Identity.Name);
             }
             else
             {
@@ -116,7 +116,7 @@ namespace TestATOH1.Controllers
                 {
                     throw new AppException("Available only to the user himself");
                 }
-                return await _repository.UpdateLogin(startLogin, endLogin);
+                return await _repository.UpdateLogin(startLogin, endLogin, User.Identity.Name);
             }
         }
 
@@ -136,7 +136,7 @@ namespace TestATOH1.Controllers
         //6.Запрос пользователя по логину, в списке долны быть имя, пол и дата рождения статус активный
         //или нет(Доступно Админам)
         [Authorize(Roles = "admin")]
-        [HttpGet("get/login")]
+        [HttpGet("get")]
         public async Task<UserGetByLoginResponseModel> GetByLogin([FromQuery] string login)
         {
 
@@ -147,7 +147,8 @@ namespace TestATOH1.Controllers
         //7.Запрос пользователя по логину и паролю(Доступно только самому пользователю, если он
         //активен (отсутствует RevokedOn))
         [Authorize]
-        [HttpGet("get/login/password")]
+        [HttpPost("get/password")]//Request with GET/HEAD method cannot have body.Therefore POST (здесь терзают сильные сомнения,
+                                        //                                                        но другого в голову не пришло)
         public async Task<UserModel> GetByLoginAndPassword([FromQuery] string login, [FromBody] string password)
         {
             
@@ -172,8 +173,8 @@ namespace TestATOH1.Controllers
         //9) Удаление пользователя по логину полное или мягкое(При мягком удалении должна
         // происходить простановка RevokedOn и RevokedBy) (Доступно Админам)
         [Authorize(Roles = "admin")]
-        [HttpDelete("remove/login")]
-        public async Task<UserModel> RemoveSoftOrFull([FromBody] string login, bool soft)
+        [HttpDelete("remove")]
+        public async Task<UserModel> RemoveSoftOrFull([FromQuery] string login, bool soft)
         {
             if(soft == true)
             {
@@ -185,10 +186,10 @@ namespace TestATOH1.Controllers
         //UPDATE-2
         //10.Восстановление пользователя - Очистка полей(RevokedOn, RevokedBy) (Доступно Админам)
         [Authorize(Roles = "admin")]
-        [HttpPut("update/login/revoke")]
-        public async Task<UserModel> UpdateRevoke([FromBody] string login)
+        [HttpPut("update/revoke")]
+        public async Task<UserModel> UpdateRevoke([FromQuery] string login)
         {
-            return await _repository.UpdateRevoked(login);
+            return await _repository.UpdateRevoked(login, User.Identity.Name);
         }
     }
 }

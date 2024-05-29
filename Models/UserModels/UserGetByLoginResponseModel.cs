@@ -9,7 +9,7 @@ namespace TestATOH1.Models.UserModels
         [Required]
         public int Gender { get; set; }// 0 - female,1-male,2-unknown
         [Required]
-        public DateOnly Birthday { get; set; }//birthday date (nullable)
+        public DateTime Birthday { get; set; }//birthday date (nullable)
         [Required]
         public bool Available { get; set; }//online/offline status
     }

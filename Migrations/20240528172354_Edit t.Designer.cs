@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestATOH1.Models.DataBaseContext;
 
@@ -11,9 +12,11 @@ using TestATOH1.Models.DataBaseContext;
 namespace TestATOH1.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    partial class UsersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528172354_Edit t")]
+    partial class Editt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,19 +84,19 @@ namespace TestATOH1.Migrations
                     b.HasData(
                         new
                         {
-                            Guid = new Guid("43b0dc01-04f2-4777-abc7-ade84bdd8613"),
+                            Guid = new Guid("f0f0aee8-b928-4fa8-a4f2-c760e5171ed1"),
                             Admin = true,
                             Birthday = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999),
                             CreatedBy = "admin",
-                            CreatedOn = new DateTime(2024, 5, 28, 20, 53, 15, 584, DateTimeKind.Local).AddTicks(1903),
+                            CreatedOn = new DateTime(2024, 5, 28, 20, 23, 54, 119, DateTimeKind.Local).AddTicks(1909),
                             Gender = 1,
                             Login = "Admin",
-                            ModifiedBy = "",
-                            ModifiedOn = new DateTime(2024, 5, 28, 20, 53, 15, 584, DateTimeKind.Local).AddTicks(1919),
+                            ModifiedBy = "admin",
+                            ModifiedOn = new DateTime(2024, 5, 28, 20, 23, 54, 119, DateTimeKind.Local).AddTicks(1929),
                             Name = "Max",
-                            PasswordHash = "$2a$11$1iIM0FCYzNJhhY0zlvR8MOFKY4rFlZcxChc/1tOiKqxiHFVQhn6p.",
-                            RevokedBy = "",
-                            RevokedOn = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999)
+                            PasswordHash = "$2a$11$EFl0yT/Clx.S4Sj06OyNqukvslidcpRyt6dJZUfSI1HrmmsaukNu6",
+                            RevokedBy = "admin",
+                            RevokedOn = new DateTime(2024, 5, 28, 20, 23, 54, 119, DateTimeKind.Local).AddTicks(1932)
                         });
                 });
 #pragma warning restore 612, 618

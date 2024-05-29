@@ -19,16 +19,16 @@ namespace TestATOH1.Models.Repository
 
         Task<UserModel> RemoveSoft(string login,string RevokedBy);
 
-        Task<UserModel> UpdateUsernameGenderBirthday(string login, UserUpdateNameGenderBirthdayRequestModel user);
+        Task<UserModel> UpdateUsernameGenderBirthday(string login, UserUpdateNameGenderBirthdayRequestModel user,string name);
 
-        Task<string> UpdatePassword(string login, string password);
+        Task<string> UpdatePassword(string login, string password,string name);
 
-        Task<string> UpdateLogin(string startLogin, string endLogin);
+        Task<string> UpdateLogin(string startLogin, string endLogin,string name);
 
         string CheckUser(string token);
         Task<UserModel> GetAvailableUser(string login);
 
-        Task<UserModel> UpdateRevoked(string login);
+        Task<UserModel> UpdateRevoked(string login,string name);
 
 
     }
