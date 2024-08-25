@@ -1,4 +1,5 @@
-Для начала работы с апи необходимо аутентифицироваться через метод Authentificate.
-Полученный токен нужно вставить в поле,которое открывается при нажатии на кнопку Authorize(Swagger UI),после чего можно пользоваться программой.
-Логин админа : Admin
-Пароль админа : admin
+To start working with the API, you need to authenticate using the Authenticate method. 
+The obtained token should be inserted into the field that opens when you click the Authorize button (Swagger UI), after which you can use the application.
+Admin login: Admin
+Admin password: admin
+
